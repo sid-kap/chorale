@@ -56,7 +56,7 @@ ascending (x:xs)
 withinOctaveGaps :: PitchedChord -> Bool
 withinOctaveGaps (x:xs)
  | null xs                              = True
- | x < (head xs) && x + 12 >= (head xs) = True
+ | x < (head xs) && (head xs) - x <= 12 = withinOctaveGaps xs
  | otherwise                            = False
 
 isValid :: PitchedChord -> Bool
@@ -95,11 +95,6 @@ bestTransition previousChord chords = snd $ minimumBy compareScores $ map ((,) p
     where compareScores a b = compare (transitionScore a) (transitionScore b)
 
 
---jumpsMoreThan :: Interval -> (PitchedChord, PitchedChord) -> Bool
---jumpsMoreThan interval (a,b) = any tooBigJumps pitchPairs
---    where pitchPairs = zip a b
---          tooBigJumps (a,b) = abs (b - a) > interval
-
 parallel :: (PitchedChord, PitchedChord) -> Interval -> Bool
 parallel (a,b) interval = any parallelPitches pitchPairs
     where pitchPairs = pairs $ zip a b
@@ -116,7 +111,7 @@ pairs (x:xs) = pairsOf x xs ++ pairs xs
 --    where jScore = jumpScore (a,b)
 --          oScore = opennessScore (a,b)
 transitionScore :: (PitchedChord, PitchedChord) -> Float
-transitionScore (a,b) = jScore - oScore
+transitionScore (a,b) = jScore -- - oScore
     where jScore = jumpScore (a,b)
           oScore = opennessScore (a,b)
 
